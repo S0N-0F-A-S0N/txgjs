@@ -1,0 +1,3 @@
+## 2024-11-11 - [Optimize inner loop of cell noise generation]
+**Learning:** Math functions like `Math.ceil` inside a hot inner loop (like pixel-wise noise generation) can drastically degrade performance. In `TG.Utils.cellNoiseBase`, the variables `qx` and `qy` were recalculating the `Math.ceil(x / density)` and `Math.ceil(y / density)` repeatedly inside a 25-iteration inner loop per pixel.
+**Action:** Always inspect inner loops for values that do not change and hoist them. Also, reusing variables or combining operations (like `px` and `py` converted directly to `dx` and `dy`) can provide small micro-optimizations that stack up nicely in frequently called numerical codes.

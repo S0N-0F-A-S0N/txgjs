@@ -1374,25 +1374,31 @@ TG.Utils = {
 	},
 	
 	cellNoiseBase: function ( x, y, seed, density, weightRange ) {
-		var qx, qy, rx, ry, w, px, py, dx, dy;
+		var qx, qy, rx, ry, w, dx, dy;
 		var dist, value;
 		var shortest = Infinity;
 		density = Math.abs( density );
+		// Bolt: Hoist constant calculations out of the inner loop
+
+
+		var cx = Math.ceil( x / density );
+		var cy = Math.ceil( y / density );
+		var s2 = seed * 2;
+		var s3 = seed * 3;
+		var wRange = weightRange > 0;
 
 		for ( var sx = -2; sx <= 2; sx++ ) {
 			for ( var sy = -2; sy <= 2; sy++ ) {
-				qx = Math.ceil( x / density ) + sx;
-				qy = Math.ceil( y / density ) + sy;
+				qx = cx + sx;
+				qy = cy + sy;
 
 				rx = TG.Utils.hashRNG( seed, qx, qy );
-				ry = TG.Utils.hashRNG( seed * 2, qx, qy );
-				w = ( weightRange > 0 ) ? 1 + TG.Utils.hashRNG( seed * 3, qx, qy ) * weightRange : 1;
+				ry = TG.Utils.hashRNG( s2, qx, qy );
+				w = wRange ? 1 + TG.Utils.hashRNG( s3, qx, qy ) * weightRange : 1;
 
-				px = ( rx + qx ) * density;
-				py = ( ry + qy ) * density;
+				dx = ( rx + qx ) * density - x;
+				dy = ( ry + qy ) * density - y;
 
-				dx = Math.abs( px - x );
-				dy = Math.abs( py - y );
 
 				dist =	( dx * dx + dy * dy ) * w;
 
